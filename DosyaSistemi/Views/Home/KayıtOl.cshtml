@@ -1,0 +1,87 @@
+﻿@{
+    ViewBag.Title = "KayıtOl";
+    Layout = "~/Views/Shared/_LogIn.cshtml";
+}
+<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
+<script src="~/Content/notify.js"></script>
+<script src="https://www.google.com/recaptcha/api.js"
+        async defer>
+</script>
+
+@using (Html.BeginForm("KayıtOl", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    <section class="body-sign">
+        <div class="center-sign">
+            <div class="panel panel-sign">
+                <div class="panel-title-sign mt-xl text-right">
+                    <h2 class="title text-uppercase text-weight-bold m-none"><i class="fa fa-user mr-xs"></i> Kayıt OL</h2>
+                </div>
+                <div class="panel-body">
+                    <form id="form112" method="post">
+                        <div class="form-group mb-lg">
+                            <label>Adınız</label>
+                            <input name="name" type="text" class="form-control input-lg" />
+                        </div>
+                        <div class="form-group mb-lg">
+                            <label>Soyadınız</label>
+                            <input name="soyad" type="text" class="form-control input-lg" />
+                        </div>
+                        <div class="form-group mb-lg">
+                            <label>Mail Adresiniz</label>
+                            <input name="mail" id="mail-adres" type="email" class="form-control input-lg" />
+                        </div>
+                        @if (TempData["maildolu"] != null)
+                        {
+                            <div class="alert alert-danger" role="alert">
+                                Bu mail daha önce kayıt edilmiş
+                            </div>
+                        }
+                        <div class="form-group mb-lg">
+                            <label>Şifreniz</label>
+                            <input name="sifre" type="password" class="form-control input-lg" />
+                        </div>
+
+                        @if (TempData["kayithata"] != null)
+                        {
+                            <div class="alert alert-danger" role="alert">
+                                Beklenmeyen bir hata oluştu
+                            </div>
+                        }
+                        <div id='recaptcha' class="g-recaptcha"
+                             data-sitekey="6LeSf5sUAAAAAHOn9ofv1fx83IAxwGj3a6DbdoDh"
+                             data-callback="onSubmit"
+                             data-size="invisible"></div>
+                        <input id="txtcaptcha" type="text" style="display:none;" required />
+                        <div class="row">
+                            <div class="col-sm-8">
+                            </div>
+                            <div class="col-sm-4 text-right">
+                                <button type="submit" class="btn btn-primary hidden-xs" id="submit">Kayıt Ol</button>
+                            </div>
+                        </div>
+                        <p class="text-center">Hesabınız var mı? <a href="/Home/Index">Giriş Yap</a></p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+}
+<script type="text/javascript">
+    onload();
+    function onSubmit(token) {
+        $('#txtcaptcha').val('e');
+    }
+    function validate(event) {
+        if (!document.getElementById('mail-adres').value) {
+            alert("Doldurulması gereken alanlar boş bırakılamaz..");
+        } else {
+            grecaptcha.execute();
+            $("#form111").submit();
+        }
+    }
+    function onload() {
+        var element = document.getElementById('submit');
+        element.onclick = validate;
+    }
+</script>

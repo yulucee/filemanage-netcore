@@ -1,0 +1,33 @@
+﻿HttpContext.Session.Clear();
+foreach(var cookie in HttpContext.Request.Cookies.Keys)
+{
+HttpContext.Response.Cookies.Delete(cookie);
+}
+return RedirectToAction("Index", "Home");
+
+https://jrgraphix.net/r/Unicode/0180-024F
+
+Scaffold-DbContext "Data Source=91.229.35.248;Initial Catalog=Filesystem_ibrahim;Persist Security Info=True;User ID=ibrahim.yuluce;Password=awq6tQN9uKUVA8VY" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models -force
+-%1.10
+Update-Database
+
+
+Geliştirilmiş arama 
+namespaces, foreach looplarının linq çevrimi--> ampul daha akıllı
+githubdaki yüksek yıldızlı açık kaynak kodlu 2000 projeyle eğitim yapılmış
+intellicode'da yıldızlı olarak üst kısımda öneri veriyor.
+c++ ve XAML desteği geldi.
+kod temizleme --> private field readonly when possible--> remove unused variable,unnecessary casts,remove unnecessary usings.
+debugger'da watch üzerinde arama yapabilme eklenmiş. (graph objelerde sorun oluyordu eskiden)
+otomatik düzenliyor kodun şeklini (if brackets)
+(entity framework ile veritabanı güncellemesi yapmaya kalktığınızda class dosyalarını oluşturmuyor)
+varsayılan olarak live-share.. başka bi developer direk ekranında
+--> hata çıkan ekranda (örn: id null) start live share çıkıyor --> link paylaşıyorsun.
+debug --> değişkenin değiştiği, eklendiği ,kaldırıldıgı yerleri direk gösteriyor. (Gösterim == Önceki değer, şimdiki değer )
+snapshot debugger iyileştirmeleri (Visual studio enterprise sürümü sadece)
+add null check otomatik ekleme 
+Debug faster with XAML hot reload for WPF in .NET Core 3.0. 
+TypeScript 3.5 desteği
+Get IntelliCode support for both TypeScript and JavaScript.
+xunit, nunit kurulu olcak (2019 Eylül)
+debug sırasında ram kullanımı Yüzde80 azaltıldı.

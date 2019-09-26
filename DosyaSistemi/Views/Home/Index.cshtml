@@ -1,0 +1,138 @@
+﻿@model DosyaSistemiDAL.Businesslayer.Entities.Kullanici
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_LogIn.cshtml";
+}
+
+@*
+    STANDART CAPTCHA
+    <script src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit"
+            async defer>
+    </script>
+
+            //var onloadCallback = function () {
+        //    grecaptcha.render('divcaptcha', {
+        //        'sitekey': '6LeSf5sUAAAAAHOn9ofv1fx83IAxwGj3a6DbdoDh',
+        //        'callback': function (response) {
+        //            $('#txtcaptcha').val('e');
+        //        }
+        //    });
+        //};
+*@
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    if (TempData["sifredegisikligi"] != null)
+    {
+        <div class="alert alert-success" role="alert">
+            Şifreniz başarıyla değiştirilmiştir.
+        </div>
+
+    }
+    if (TempData["linkgecerlilik"] != null)
+    {
+        <div class="alert alert-danger" role="alert">
+            Linkin geçerliliği dolmuştur.
+        </div>
+
+    }
+    <div class="panel panel-sign">
+        <div class="panel-title-sign mt-xl text-right">
+            <h2 class="title text-uppercase text-weight-bold m-none"><i class="fa fa-user mr-xs"></i> Kullanıcı Girişi </h2>
+        </div>
+        <div class="panel-body">
+            <form action="index.html" method="post" id="form111">
+
+                <div class="form-group mb-lg">
+                    @Html.LabelFor(model => model.KullaniciMaili)
+                    <div class="input-group input-group-icon">
+                        @Html.EditorFor(model => model.KullaniciMaili, new { htmlAttributes = new { @class = "form-control input-lg" } })
+                        @Html.ValidationMessageFor(model => model.KullaniciMaili, "", new { @class = "text-danger" })
+                        <span class="input-group-addon">
+                            <span class="icon icon-lg">
+                                <i class="fa fa-envelope"></i>
+                            </span>
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group mb-lg">
+                    <div class="clearfix">
+                        @Html.LabelFor(model => model.KullaniciSifresi)
+                        <a href="/Home/ParolamıUnuttum" class="pull-right">Şifremi unuttum</a>
+                    </div>
+                    <div class="input-group input-group-icon">
+                        @Html.EditorFor(model => model.KullaniciSifresi, new { htmlAttributes = new { @class = "form-control input-lg", @type = "password" } })
+                        @Html.ValidationMessageFor(model => model.KullaniciSifresi, "", new { @class = "text-danger" })
+                        <span class="input-group-addon">
+                            <span class="icon icon-lg">
+                                <i class="fa fa-lock"></i>
+                            </span>
+                        </span>
+                    </div>
+                </div>
+                @if (TempData["girisHatasi"] != null)
+                {
+                    <div>
+                        <div class="alert alert-danger" role="alert">
+                            @TempData["girisHatasi"].ToString()
+                        </div>
+                    </div>
+                }
+                @if (TempData["hataligiris"] != null)
+                {
+                    <div>
+                        <div class="alert alert-danger" role="alert">
+                            @TempData["hataligiris"].ToString()
+                        </div>
+                    </div>
+                }
+                <div id='recaptcha' class="g-recaptcha"
+                         data-sitekey="6LeSf5sUAAAAAHOn9ofv1fx83IAxwGj3a6DbdoDh"
+                         data-callback="onSubmit"
+                         data-size="invisible"></div>
+                    <input id="txtcaptcha" type="text" style="display:none;" required/>
+                    <br />
+                <div class="row">
+                    <div class="col-md-8">
+                    </div>
+                    <div class="col-sm-4 text-right">
+                        <button type="submit" class="btn btn-primary hidden-xs" id="submit">Giriş Yap</button>
+                        @*<button type="submit" class="btn btn-primary btn-block btn-lg visible-xs mt-lg">Sign In</button>*@
+                    </div>
+                </div>
+                <p class="text-center">Hesabınız Yok Mu? <a href="/Home/KayıtOl">Kayıt Ol</a></p>
+            </form>
+        </div>
+    </div>
+}
+@if (TempData["uyekayitbasarili"] != null)
+{
+    <script>
+        $(document).ready(function () {
+            $.notify("@TempData["uyekayitbasarili"]", "success");
+        })
+    </script>
+}
+<script type="text/javascript">
+
+    onload();
+    function onSubmit(token) {
+        $('#txtcaptcha').val('e');
+    }
+    function validate(event) {
+        if (!document.getElementById('KullaniciMaili').value) {
+            alert("Bu alan boş bırakılamaz");
+        } else {
+            grecaptcha.execute();
+            $("#form111").submit();
+        }
+    }
+    function onload() {
+        var element = document.getElementById('submit');
+        element.onclick = validate;
+    }
+
+</script>
+

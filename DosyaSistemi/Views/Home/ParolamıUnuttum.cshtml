@@ -1,0 +1,51 @@
+﻿@{
+    ViewBag.Title = "ParolamıUnuttum";
+    Layout = "~/Views/Shared/_LogIn.cshtml";
+}
+@using (Html.BeginForm("ParolamıUnuttum", "Home", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    <section class="body-sign">
+        <div class="center-sign">
+            <div class="panel panel-sign">
+                <div class="panel-title-sign mt-xl text-right">
+                    <h2 class="title text-uppercase text-weight-bold m-none"><i class="fa fa-user mr-xs"></i> Parola Sıfırla</h2>
+                </div>
+                <div class="panel-body">
+                    <div class="alert alert-info">
+                        <p class="m-none text-weight-semibold h6">Mail adresinizi aşağıdaki boşluğa yazınız!</p>
+                    </div>
+                    <form>
+                        <div class="form-group mb-none">
+                            <div class="input-group">
+                                <input name="username" type="email" placeholder="E-mail" class="form-control input-lg" />
+                                <span class="input-group-btn">
+                                    <button class="btn btn-primary btn-lg" type="submit">Sıfırla!</button>
+                                </span>
+                            </div>
+                        </div>
+                        @if (TempData["sifirlamaMailHatasi"] != null)
+                        {
+                            <div>
+                                <div class="alert alert-success" role="alert">
+                                    Mail başarıyla gönderilmiştir.
+                                </div>
+                            </div>
+                        }
+                        @if (TempData["mailbasarili"] != null)
+                        {
+                            <div>
+                                <div class="alert alert-success" role="alert">
+                                    Mail başarıyla gönderilmiştir.
+                                </div>
+                            </div>
+                        }
+                        <p class="text-center mt-lg">Hatırladınız mı? <a href="/Home/Index">Giriş Yap!</a></p>
+                    </form>
+                </div>
+            </div>
+            <p class="text-center text-muted mt-md mb-md">&copy; @DateTime.Now.Year</p>
+        </div>
+    </section>
+
+}

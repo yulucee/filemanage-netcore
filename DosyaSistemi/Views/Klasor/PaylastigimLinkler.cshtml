@@ -1,0 +1,180 @@
+﻿@model  DosyaSistemiDAL.BusinessLayer.Models.LinkMultipleClass
+@{
+    if(Context.Session.GetString("kullaniciId") == null)
+    {
+        Context.Response.Redirect("https://localhost:44348/Home/Index");
+    }
+    ViewBag.Title = "PaylastigimLinkler";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    input[id="linkcheckbox"] {
+        position: absolute;
+        opacity: 0;
+    }
+        /* Normal Track */
+        input[id="linkcheckbox"].ios-switch + div {
+            vertical-align: middle;
+            width: 40px;
+            height: 20px;
+            border: 1px solid rgba(0,0,0,.4);
+            border-radius: 999px;
+            background-color: rgba(0, 0, 0, 0.1);
+            -webkit-transition-duration: .4s;
+            -webkit-transition-property: background-color, box-shadow;
+            box-shadow: inset 0 0 0 0px rgba(0,0,0,0.4);
+            margin: 15px 1.2em 15px 2.5em;
+        }
+
+
+        /* Tiny Track */
+        input[id="linkcheckbox"].tinyswitch.ios-switch + div {
+            width: 34px;
+            height: 18px;
+        }
+
+
+        /* Green Track */
+        input[id="linkcheckbox"].green.ios-switch:checked + div {
+            background-color: #00e359;
+            border: 1px solid rgba(0, 162, 63,1);
+            box-shadow: inset 0 0 0 10px rgba(0,227,89,1);
+        }
+
+        /* Normal Knob */
+        input[id="linkcheckbox"].ios-switch + div > div {
+            float: left;
+            width: 18px;
+            height: 18px;
+            border-radius: inherit;
+            background: #ffffff;
+            -webkit-transition-timing-function: cubic-bezier(.54,1.85,.5,1);
+            -webkit-transition-duration: 0.4s;
+            -webkit-transition-property: transform, background-color, box-shadow;
+            -moz-transition-timing-function: cubic-bezier(.54,1.85,.5,1);
+            -moz-transition-duration: 0.4s;
+            -moz-transition-property: transform, background-color;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3), 0px 0px 0 1px rgba(0, 0, 0, 0.4);
+            pointer-events: none;
+            margin-top: 1px;
+            margin-left: 1px;
+        }
+
+
+        /* Tiny Knob */
+        input[id="linkcheckbox"].tinyswitch.ios-switch + div > div {
+            width: 16px;
+            height: 16px;
+            margin-top: 1px;
+        }
+
+        /* Checked Tiny Knob (Blue Style) */
+        input[id="linkcheckbox"].tinyswitch.ios-switch:checked + div > div {
+            -webkit-transform: translate3d(16px, 0, 0);
+            -moz-transform: translate3d(16px, 0, 0);
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3), 0px 0px 0 1px rgba(8, 80, 172,1);
+        }
+        /* Green Knob */
+        input[id="linkcheckbox"].green.ios-switch:checked + div > div {
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 162, 63,1);
+        }
+</style>
+
+<section class="panel">
+    <header class="panel-heading">
+        <div class="panel-actions">
+            <a href="#" class="panel-action panel-action-toggle" data-panel-toggle></a>
+            <a href="#" class="panel-action panel-action-dismiss" data-panel-dismiss></a>
+        </div>
+
+        <h2 class="panel-title">Basic</h2>
+    </header>
+    <div class="panel-body">
+        <table class="table table-bordered table-striped mb-none" id="datatable-default">
+            <thead>
+                <tr>
+                    <th>Dosya Adı</th>
+                    <th>Paylaşım Zamanı</th>
+                    <th>Görüntüleme Sayısı</th>
+                    <th class="hidden-xs">Link</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.linkler)
+                {
+                    <tr class="paylastigimlinktr" id="@item.Id">
+                        <td>@item.DosyaAdi</td>
+                        <td>@item.YaratilmaZamani.ToString().Substring(0, 18)</td>
+
+                        @if (item.ToplamOnizleme == null)
+                        {
+                            <td> 0 </td>
+                        }
+                        else
+                        {
+                            <td>@item.ToplamOnizleme</td>
+                        }
+                    <td class="center hidden-xs">https://localhost:44348/Klasor/ShareWithLink?code=@item.Guid</td>
+                        <td>
+                            <label style="margin-left:15px;">
+                                <input id="linkcheckbox" type="checkbox" class="ios-switch green tinyswitch K_@item.Id" checked />
+                                <div><div></div></div>
+                            </label>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</section>
+
+
+<script>
+
+    $(document).ready(function () {
+        $.fn.dataTable.moment('YYYY-MM-DDThh:mm:ss');
+        $('#datatable-default').dataTable({
+            responsive: true,
+            "order": [[3, "desc"]]
+        });
+    });
+    $("input[id='linkcheckbox']").click(function () {
+        if ($("#linkcheckbox").prop('checked') == true) {
+            var id = $(this).closest('.paylastigimlinktr').attr('id');
+            checked = 1;
+            $.ajax({
+                type: "POST",
+                url: "/Klasor/LinkKapat2",
+                data: { DosyaId: id, Checked: checked },
+                success: function (data) {
+                    if (data.result == true) {
+                        elementremove(id);
+                    }
+                }
+            })
+        }
+        else {
+            checked = 2;
+            var id = $(this).closest('.paylastigimlinktr').attr('id');
+            $.ajax({
+                type: "POST",
+                url: "/Klasor/LinkKapat2",
+                data: { DosyaId: id, Checked: checked },
+                success: function (data) {
+                    if (data.result == true) {
+                        elementremove(id);
+                    }
+                }
+            })
+        }
+    })
+    var elementremove = function (id) {
+        var element = $("#" + id);
+        element.remove();
+    }
+
+    //setTimeout(function () {
+    //    window.location.reload(1);
+    //}, 7000);
+</script>

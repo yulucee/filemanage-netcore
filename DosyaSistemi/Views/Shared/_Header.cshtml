@@ -1,0 +1,53 @@
+﻿@using Microsoft.AspNetCore.Http;
+<header class="header">
+    <div class="logo-container">
+        <a href="../" class="logo">
+            <img src="~/Template/assets/images/logo3.png" height="44" width="150" style="margin-top:-3px;" alt="File Manager" />
+        </a>
+        <div class="visible-xs toggle-sidebar-left" data-toggle-class="sidebar-left-opened" data-target="html" data-fire-event="sidebar-left-opened">
+            <i class="fa fa-bars" aria-label="Toggle sidebar"></i>
+        </div>
+    </div>
+    <div class="header-right">
+        <span class="separator"></span>
+        <div id="userbox" class="userbox">
+            <a href="#" data-toggle="dropdown">
+                <figure class="profile-picture">
+                    <img src="https://hastayataklari.com/wp-content/uploads/2018/05/822711_user_512x512.png" alt="Joseph Doe" class="img-circle" data-lock-picture="~/Template/assets/images/!logged-user.jpg" />
+                </figure>
+                <div class="profile-info">
+                    <span class="name" style="text-transform:uppercase;">@Context.Session.GetString("kullaniciAdi")</span>
+                    <span class="role">Merhaba</span>
+                </div>
+                <i class="fa custom-caret"></i>
+            </a>
+            <div class="dropdown-menu">
+                @if (Context.Session.GetString("kullaniciId") != null)
+                {
+                    <ul class="list-unstyled">
+                        <li class="divider"></li>
+                        <li>
+                            <a role="menuitem" tabindex="-1" href="/Home/MyProfile"><i class="fa fa-user"></i> Profilim</a>
+                        </li>
+                        <li>
+                            <a role="menuitem" tabindex="-1" href="#" data-lock-screen="true"><i class="fa fa-lock"></i> Kilitle</a>
+                        </li>
+                        <li>
+                            <a role="menuitem" tabindex="-1" href="/Home/LogOut"><i class="fa fa-power-off"></i> Çıkış Yap</a>
+                        </li>
+                    </ul>
+                }
+                else
+                {
+                    <ul class="list-unstyled">
+                        <li class="divider"></li>
+                        <li style="font-size:12px;margin-left:10px;">Üye misiniz ? </li>
+                        <li>
+                            <a role="menuitem" tabindex="-1" href="/Home/Index"><i class="fa fa-user"></i> Giriş Yap</a>
+                        </li>
+                    </ul>
+                }
+            </div>
+        </div>
+    </div>
+</header>

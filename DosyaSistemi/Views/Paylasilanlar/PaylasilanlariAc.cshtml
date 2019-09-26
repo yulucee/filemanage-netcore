@@ -1,0 +1,454 @@
+﻿@model  DosyaSistemiDAL.BusinessLayer.Models.PaylasilanlarMultipleTable
+@{
+    if (Context.Session.GetString("kullaniciId") == null)
+    {
+        Context.Response.Redirect("localhost:44348/Home/Index");
+    }
+    ViewBag.Title = "PaylasilanlariAc";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div style="display:none;">
+    <span>You've selected:</span> <span id="select-result">none</span>
+</div>
+
+<link rel="stylesheet" href="~/Content/allfolder.css" />
+<div id="desktop">
+    <ul id="selectable">
+        @foreach (var item in Model.paylasilanlar.Where(x => x.DosyaMi == null))
+        {
+            if (Convert.ToInt32(Context.Session.GetString("kullaniciId")) == item.PaylasilanKisi)
+            {
+                <li class="desktop-icon folder-yetki-@item.Yetki" id="@item.DosyaId">
+                    <div class="card111" id="@item.DosyaId">
+                        <div class="card112">
+                            <div class="folder folderin"></div>
+                            <div class="folder-tab"></div>
+                            @if (item.Adi.Length > 10)
+                            {
+                                <span class="folder-name roww_@item.DosyaId">@item.Adi.Substring(0, 9)..</span>
+                            }
+                            else
+                            {
+                                <span class="folder-name roww_@item.DosyaId">@item.Adi</span>
+                            }
+                            <span class="folder-name">@item.PaylasilmaTarihi.ToString().Substring(0, 9)</span>
+                        </div>
+                    </div>
+                </li>
+            }
+        }
+        @foreach (var item in Model.paylasilanlar.Where(x => x.DosyaMi == true))
+        {
+            if (Convert.ToInt32(Context.Session.GetString("kullaniciId")) == item.PaylasilanKisi)
+            {
+                <li class="file111list" id="@item.DosyaId">
+                    <div class="fileContainer111 file111yetki-@item.Yetki" id="@item.DosyaId">
+                        <a href="#">
+                            <span class="file111">
+                                <i class="fa fa-picture-o"></i>
+                            </span>
+                            @if (item.Adi.Length > 8)
+                            {
+                                <h6 class="fileName111 roll_@item.DosyaId" data-toggle="tooltip" data-placement="bottom" title="@item.Adi">@item.Adi.ToString().Substring(0, 5)...</h6>
+                                <h6 class="fileName111">@item.PaylasilmaTarihi.ToString().Substring(0, 9)</h6>
+
+                            }
+                            else
+                            {
+                                <h6 class="fileName111 roll_@item.DosyaId" data-toggle="tooltip" data-placement="bottom">@item.Adi</h6>
+                                <h6 class="fileName111">@item.PaylasilmaTarihi.ToString().Substring(0, 9)</h6>
+                            }
+                        </a>
+                    </div>
+                </li>
+            }
+        }
+    </ul>
+</div>
+<!--
+Video Player Modal
+-->
+<div class="modal fade" id="videoplayer" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div id="instructions">
+                    <video id="my_video_1" class="video-js vjs-default-skin" style="width:565px;height:267px;"
+                           controls preload="none"
+                           data-setup='{ "aspectRatio":"640:267", "playbackRates": [1, 1.5, 2] }'>
+                        <source id="videoizle" src="" type='video/mp4' />
+                    </video>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Kapat</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--
+IMAGE VİEVER MODAL
+-->
+<div class="modal fade" id="imageviewer" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <img id="resimgoruntuleyicisi" src="" width="570" height="500">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Kapat</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--
+PDF VİEWER MODAL
+-->
+<div class="modal fade" id="pdfviewer" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content" style="width:700px;height:700px;">
+            <div class="modal-body">
+                <object id="pdfgoster" data="" type="application/pdf" width="670" height="600">
+                    <a id="pdflink" href=""></a>
+                </object>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Kapat</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--
+TEXT VİEWER MODAL
+-->
+<div class="modal fade" id="textviewer" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content" style="width:700px;height:700px;">
+            <div class="modal-body">
+                <p>
+                    <iframe id="textviewerframe" src="" frameborder="0" height="650" width="660"></iframe>
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Kapat</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--
+YUKLEME YAPILAN DIV
+-->
+<div class="upload upload-yok" id="yuklemeyapilandiv">
+    <div class="upload-files">
+        <form method="post" enctype="multipart/form-data" style="width:1200px;" action="@Url.Action("PaylasilanaEkle","Paylasilanlar")">
+            <div class="body" id="drop">
+                <i class="fa fa-file-text-o pointer-none" aria-hidden="true"></i>
+                <p class="pointer-none">Dosyaları <b>sürükle bırak</b><br /> veya <br /><a href="" id="triggerFile">Dosyalarında </a> ara</p>
+                <input type="hidden" id="klasorId" name="klasorId" value="@ViewBag.MainId" />
+                <input type="file" name="Files" id="Files" multiple="multiple" />
+            </div>
+            <footer>
+                <div class="divider">
+                    <span><AR>DOSYALARINIZ</AR></span>
+                </div>
+                <div class="list-files">
+                </div>
+                <button type="submit" class="importar">YÜKLE</button>
+            </footer>
+        </form>
+    </div>
+</div>
+
+@if (ViewBag.YuklemeHata != null && ViewBag.YuklemeHata != "")
+{
+    <script>
+        $(document).ready(function () {
+            $.notify('@ViewBag.YuklemeHata');
+        })
+    </script>
+
+}
+@if (ViewBag.Basarili != null && ViewBag.Basarili != "")
+{
+    <script>
+        $(document).ready(function () {
+       $.notify("@ViewBag.Basarili", "success");
+        })
+    </script>
+}
+<input type="hidden" id="hiddenKlasorId" />
+<input type="hidden" id="hiddenDosyaId" />
+<script>
+    var id = '@ViewBag.MainId';
+          var dosyaIndir = function (id) {
+            $("#hiddenDosyaId").val(id);
+            var dosyaid = $("#hiddenDosyaId").val();
+            window.location = '@Url.Action("DosyaDownload","Klasor")?DosyaId=' + dosyaid;
+          }
+     var klasorIndir = function (id) {
+        $("#hiddenKlasorId").val(id);
+        var klasorid = $("#hiddenKlasorId").val();
+        location.href = '@Url.Action("KlasorDownload","Klasor")?KlasorId=' + klasorid;
+    }
+     var kullanicibilgi = function (id) {
+        var id = $("#select-result").text();
+        location.href = '@Url.Action("BenimlePaylasanlarBilgi", "Paylasilanlar")?id=' + id;
+    }
+    $.contextMenu({
+        selector: '.file111yetki-1',
+        items: {
+            "paste": {
+                name: "Önizle",
+                icon: "fas fa-eye",
+                accessKey: "O",
+                callback: function (itemKey, opt, id) {
+                    var id = $(this).closest('.file111yetki-1').attr('id');
+                    videoplayer(id);
+                }
+            },
+            "edit": {
+                name: "Bilgi",
+                icon: "fas fa-info-circle",
+                accessKey: "I",
+                callback: function (itemKey, opt, id) {
+                    kullanicibilgi(id);
+                }
+            },
+        },
+    });
+    $.contextMenu({
+        selector: '.file111yetki-2',
+        items: {
+            "edit": {
+                name: "Indir",
+                icon: "fas fa-download",
+                accessKey: "I",
+                callback: function (itemKey, opt, id) {
+                    var id = $(this).closest('.file111yetki-2').attr('id');
+                    dosyaIndir(id);
+                }
+            },
+            "cut": {
+                name: "Bilgi",
+                icon: "fas fa-info-circle",
+                accessKey: "I",
+                callback: function (itemKey, opt, id) {
+                    kullanicibilgi(id);
+                }
+            },
+        },
+    });
+    $.contextMenu({
+        selector: '.file111yetki-3',
+        items: {
+            "paste": {
+                name: "Önizle",
+                icon: "fas fa-eye",
+                accessKey: "O",
+                callback: function (itemKey, opt, id) {
+                    var id = $(this).closest('.file111yetki-3').attr('id');
+                    videoplayer(id);
+                }
+            },
+            "cut": {
+                name: "Indir",
+                icon: "fas fa-download",
+                accessKey: "I",
+                callback: function (itemKey, opt, id) {
+                    var id = $(this).closest('.file111yetki-3').attr('id');
+                    dosyaIndir(id);
+                }
+            },
+            "edit": {
+                name: "Bilgi",
+                icon: "fas fa-info-circle",
+                accessKey: "I",
+                callback: function (itemKey, opt, id) {
+                    kullanicibilgi(id);
+                }
+            },
+        },
+    });
+    //Klasorlerin contexi
+    //Klasorlerin contexi
+    $.contextMenu({
+        selector: '.folder-yetki-1',
+        items: {
+            "edit": {
+                name: "Aç",
+                icon: "fas fa-eye",
+                accessKey: "A",
+                callback: function (itemKey, opt, id) {
+                    var id = $(this).closest('.folder-yetki-1').attr('id');
+                    location.href = "/Paylasilanlar/PaylasilanlariAc/" + id;
+                }
+            },
+            "cut": {
+                name: "Bilgi",
+                icon: "fas fa-info-circle",
+                accessKey: "I",
+                callback: function (itemKey, opt, id) {
+                    kullanicibilgi(id);
+                }
+            },
+        },
+    });
+    $.contextMenu({
+        selector: '.folder-yetki-2',
+        items: {
+            "edit": {
+                name: "Indir",
+                icon: "fas fa-download",
+                accessKey: "I",
+                callback: function (itemKey, opt, id) {
+                    var id = $(this).closest('.folder-yetki-2').attr('id');
+                    klasorIndir(id);
+                }
+            },
+            "cut": {
+                name: "Bilgi",
+                icon: "fas fa-info-circle",
+                accessKey: "I",
+                callback: function (itemKey, opt, id) {
+                    kullanicibilgi(id);
+                }
+            },
+        },
+    });
+    $.contextMenu({
+        selector: '.folder-yetki-3',
+        items: {
+            "paste": {
+                name: "Aç",
+                icon: "fas fa-folder-open",
+                accessKey: "A",
+                callback: function (itemKey, opt, id) {
+                    var id = $(this).closest('.folder-yetki-3').attr('id');
+                    location.href = "/Paylasilanlar/PaylasilanlariAc/" + id;
+                }
+            },
+            "cut": {
+                name: "Indir",
+                icon: "fas fa-download",
+                accessKey: "I",
+                callback: function (itemKey, opt, id) {
+                    var id = $(this).closest('.folder-yetki-3').attr('id');
+                    klasorIndir(id);
+                }
+            },
+            "edit": {
+                name: "Bilgi",
+                icon: "fas fa-info-circle",
+                accessKey: "I",
+                callback: function (itemKey, opt, id) {
+                    kullanicibilgi(id);
+                }
+            },
+        },
+    });
+
+    $(function () {
+        $("#selectable").selectable({
+            stop: function () {
+                var result = $("#select-result").empty();
+                $(".ui-selected", this).each(function () {
+                    var value = $(this).attr('id');
+                    result.append("*" + value);
+                });
+            }
+        });
+    });
+    var videoplayer = function (id) {
+        $("#hiddenDosyaId").val(id);
+        var kid = $("#hiddenDosyaId").val();
+        $.ajax({
+            type: "POST",
+            url: "/Klasor/VideoPlayer",
+            data: { DosyaId: kid },
+            success: function (data) {
+                if (data.result == true && data.dosyatipi == ".mp4") {
+                    $("#videoplayer").modal("show");
+                    $("#my_video_1_html5_api").attr("src", data.url);
+                    $("#videoizle").attr("src", data.url);
+                }
+                else if (data.result == true && data.dosyatipi == ".png") {
+                    $("#imageviewer").modal("show");
+                    $("#resimgoruntuleyicisi").attr("src", data.url);
+                }
+                else if (data.result == true && data.dosyatipi == ".pdf") {
+                    $("#pdfviewer").modal("show");
+                    $("#pdflink").attr("href", data.url);
+                    $("#pdfgoster").attr("data", data.url);
+                }
+                else if (data.result == true && data.dosyatipi == ".txt") {
+                    $("#textviewer").modal("show");
+                    $("#textviewerframe").attr("src", data.url);
+                }
+            }
+        })
+    }
+
+    var op = document.querySelector.bind(document);
+    var App = {};
+    App.init = function () {
+        function handleFileSelect(evt) {
+            var files = evt.target.files;
+            var template = "".concat(Object.keys(files).map(function (file) {
+                return "<div class=\"file file--".concat(file, "\">\n     <div class=\"name\"><span>").concat(files[file].name, "</span></div>\n     <div class=\"progress active\"></div>\n     <div class=\"done\">\n\t<a href=\"\" target=\"_blank\">\n      <svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" version=\"1.1\" x=\"0px\" y=\"0px\" viewBox=\"0 0 1000 1000\">\n\t\t<g><path id=\"path\" d=\"M500,10C229.4,10,10,229.4,10,500c0,270.6,219.4,490,490,490c270.6,0,490-219.4,490-490C990,229.4,770.6,10,500,10z M500,967.7C241.7,967.7,32.3,758.3,32.3,500C32.3,241.7,241.7,32.3,500,32.3c258.3,0,467.7,209.4,467.7,467.7C967.7,758.3,758.3,967.7,500,967.7z M748.4,325L448,623.1L301.6,477.9c-4.4-4.3-11.4-4.3-15.8,0c-4.4,4.3-4.4,11.3,0,15.6l151.2,150c0.5,1.3,1.4,2.6,2.5,3.7c4.4,4.3,11.4,4.3,15.8,0l308.9-306.5c4.4-4.3,4.4-11.3,0-15.6C759.8,320.7,752.7,320.7,748.4,325z\"</g>\n\t\t</svg>\n\t\t\t\t\t\t</a>\n     </div>\n    </div>");
+            }).join(""));
+            op("#drop").classList.add("hidden");
+            op("footer").classList.add("hasFiles");
+            op(".importar").classList.add("active");
+            setTimeout(function () {
+                op(".list-files").innerHTML = template;
+            }, 1000);
+            Object.keys(files).forEach(function (file) {
+                var load = 2000 + file * 2000;
+                setTimeout(function () {
+                    op(".file--".concat(file)).querySelector(".progress").classList.remove("active");
+                    op(".file--".concat(file)).querySelector(".done").classList.add("anim");
+                }, load);
+            });
+        }
+        op("#triggerFile").addEventListener("click", function (evt) {
+            evt.preventDefault();
+            op("input[type=file]").click();
+        });
+        /*sürüklenen nesneyi dışarı çıkartınca*/
+        op("#drop").ondragleave = function (evt) {
+            op("#drop").classList.remove("active");
+            op("#desktop").classList.remove("desktop-none");/*eklenen 20/03/2019 */
+            op("#yuklemeyapilandiv").classList.add("upload-yok"); /*eklenen 20/03/2019*/
+            evt.preventDefault();
+        };
+        /*sürükleyince*/
+        op("#drop").ondragover = op("#drop").ondragenter = function (evt) {
+            op("#drop").classList.add("active");
+            evt.preventDefault();
+        };
+        /*bırakıldığında*/
+        op("#drop").ondrop = function (evt) {
+            op("input[type=file]").files = evt.dataTransfer.files;
+            op("footer").classList.add("hasFiles");
+            op("#drop").classList.remove("active");
+            evt.preventDefault();
+        };
+        op("#desktop").ondragover = op("#desktop").ondragenter = function (evt) {
+            op("#desktop").classList.add("desktop-none");
+               /*eklenen kısım 20/03/2019*/ op("#yuklemeyapilandiv").classList.remove("upload-yok");
+                /*eklenen kısım 20/03/2019 14.16*/op("#drop").classList.add("active");
+            evt.preventDefault();
+        };
+
+        op(".importar").addEventListener("click", function () {
+            op(".list-files").innerHTML = "";
+            op("footer").classList.remove("hasFiles");
+            op(".importar").classList.remove("active");
+            setTimeout(function () {
+                $("#drop").classList.remove("hidden");
+            }, 500);
+        });
+        op("input[type=file]").addEventListener("change", handleFileSelect);
+    }();
+</script>

@@ -1,0 +1,45 @@
+        public ActionResult VideoPlayer(int DosyaId)
+        {
+            bool result = false;
+            Dosya dosya = db.Dosyas.SingleOrDefault(x => x.DosyaId == DosyaId);
+            var dosyatipi = dosya.DosyaTipi;
+            var dosyaadi = dosya.DosyaAdi;
+            var path = dosya.DosyaYolu;
+            if (dosyatipi == ".mp4")
+            {
+                var virtualpath = path.Replace(Request.ServerVariables["APPL_PHYSICAL_PATH"], String.Empty);
+                var source = virtualpath.Replace(@"\", @"/");
+                var src = "/" + source;
+                var url = src;
+                result = true;
+                return Json(data: new { result = result, dosyatipi = dosyatipi, url = url }, behavior: JsonRequestBehavior.AllowGet);
+            }
+            else if (dosyatipi == ".png" || dosyatipi == ".jpeg" || dosyatipi == ".jpg")
+            {
+                var virtualpath = path.Replace(Request.ServerVariables["APPL_PHYSICAL_PATH"], String.Empty);
+                var source = virtualpath.Replace(@"\", @"/");
+                var src = "/" + source;
+                var url = src;
+                result = true;
+                return Json(new { result = result, dosyatipi = dosyatipi, url = url }, JsonRequestBehavior.AllowGet);
+            }
+            else if (dosyatipi == ".pdf")
+            {
+                var virtualpath = path.Replace(Request.ServerVariables["APPL_PHYSICAL_PATH"], String.Empty);
+                var source = virtualpath.Replace(@"\", @"/");
+                var src = "/" + source;
+                var url = src;
+                result = true;
+                return Json(new { result = result, dosyatipi = dosyatipi, url = url, dosyaadi = dosyaadi }, JsonRequestBehavior.AllowGet);
+            }
+            else if (dosyatipi == ".txt")
+            {
+                var virtualpath = path.Replace(Request.ServerVariables["APPL_PHYSICAL_PATH"], String.Empty);
+                var source = virtualpath.Replace(@"\", @"/");
+                var src = "/" + source;
+                var url = src;
+                result = true;
+                return Json(new { result = result, dosyatipi = dosyatipi, url = url }, JsonRequestBehavior.AllowGet);
+            }
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
